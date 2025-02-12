@@ -13,27 +13,35 @@ async def submit_scan(request: Request):
     if not target:
         raise HTTPException(status_code=400, detail="Target is required")
     scan_id = str(uuid.uuid4())
-    # Submit Nmap task
-    nmap_task = celery_app.send_task(
-        'agents.nmap_agent.run_nmap',
-        args=(target, "-sV")
-    )
     
-    # Submit WhatWeb task
-    whatweb_task = celery_app.send_task(
-        'agents.whatweb_agent.run_whatweb',
-        args=(target,)
-    )
-    
-    # Store task IDs in DB
-    with get_db_connection() as conn:
-        conn.execute(
-            "INSERT INTO scans (id, target, tool, status) VALUES (?, ?, ?, ?)",
-            (scan_id, target, "nmap", "pending")
+    try:
+        # Submit Nmap task
+        nmap_task = celery_app.send_task(
+            'agents.nmap_agent.run_nmap',
+            args=(target, "-sV")
         )
-        conn.commit()
-    
-    return {"scan_id": scan_id}
+        
+        # Submit WhatWeb task
+        whatweb_task = celery_app.send_task(
+            'agents.whatweb_agent.run_whatweb',
+            args=(target,)
+        )
+        
+        # Store task IDs in DB
+        with get_db_connection() as conn:
+            conn.execute(
+                "INSERT INTO scans (id, target, tool, status) VALUES (?, ?, ?, ?)",
+                (scan_id, target, "nmap", "pending")
+            )
+            conn.execute(
+                "INSERT INTO scans (id, target, tool, status) VALUES (?, ?, ?, ?)",
+                (scan_id, target, "whatweb", "pending")
+            )
+            conn.commit()
+        
+        return {"scan_id": scan_id}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Failed to submit scan: {e}")
 
 @app.get("/results/{scan_id}")
 async def get_results(scan_id: str):
