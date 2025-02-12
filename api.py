@@ -20,12 +20,12 @@ async def submit_scan(request: Request):
             'agents.nmap_agent.run_nmap',
             args=(target, "-sV")
         )
-        
+        print(f"Submitted Nmap task: {nmap_task.id}") 
         # Submit WhatWeb task
-        whatweb_task = celery_app.send_task(
-            'agents.whatweb_agent.run_whatweb',
-            args=(target,)
-        )
+        #whatweb_task = celery_app.send_task(
+        #    'agents.whatweb_agent.run_whatweb',
+        #    args=(target,)
+       # )
         
         # Store task IDs in DB
         with get_db_connection() as conn:
