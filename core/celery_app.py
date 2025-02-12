@@ -12,7 +12,7 @@ app = Celery(
 )
 
 # Ensure tasks are discovered
-app.autodiscover_tasks(['agents'])
+app.autodiscover_tasks(['agents.nmap_agent', 'agents.whatweb_agent'])
 
 app.conf.task_track_started = True
 
