@@ -1,6 +1,6 @@
 # nerv
 
-![image](https://github.com/user-attachments/assets/bebd9448-6ab5-4541-8db6-38ba8b740320)
+<center>![image](https://github.com/user-attachments/assets/bebd9448-6ab5-4541-8db6-38ba8b740320)</center>
 
 ### how to run?
 
