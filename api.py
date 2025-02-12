@@ -2,13 +2,14 @@ from fastapi import FastAPI, HTTPException
 from core.celery_app import app as celery_app
 from core.database import get_db_connection
 import uuid
+# Define a Pydantic model for the request body
 
 app = FastAPI()
 
 @app.post("/scan")
-async def submit_scan(target: str):
+async def submit_scan():
+    target = scan_request.target  # Extract the target from the request body
     scan_id = str(uuid.uuid4())
-    
     # Submit Nmap task
     nmap_task = celery_app.send_task(
         'agents.nmap_agent.run_nmap',
@@ -30,7 +31,7 @@ async def submit_scan(target: str):
     conn.commit()
     conn.close()
     
-    return f'{"scan_id": {scan_id}}'
+    return {"scan_id": scan_id}
 
 @app.get("/results/{scan_id}")
 async def get_results(scan_id: str):
