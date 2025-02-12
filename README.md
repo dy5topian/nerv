@@ -1,6 +1,6 @@
 # nerv
+![eva](https://github.com/user-attachments/assets/5336736d-c0ba-40ff-955d-e0acbd50fcfb)
 
-![eva](https://github-production-user-asset-6210df.s3.amazonaws.com/76063719/412504357-bebd9448-6ab5-4541-8db6-38ba8b740320.png)
 ### how to run?
 
 => start redis server with : $redis-server
