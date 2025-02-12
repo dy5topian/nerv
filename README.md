@@ -1,8 +1,8 @@
 # nerv
 
 <p>
-<img src='https://github-production-user-asset-6210df.s3.amazonaws.com/76063719/412504357-bebd9448-6ab5-4541-8db6-38ba8b740320.png' align='center' >
-</p>p
+<img src="https://github-production-user-asset-6210df.s3.amazonaws.com/76063719/412504357-bebd9448-6ab5-4541-8db6-38ba8b740320.png" align='center' >
+</p>
 ### how to run?
 
 => start redis server with : $redis-server
