@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
 from core.celery_app import app as celery_app
 from core.database import get_db_connection
 import uuid
@@ -7,8 +7,11 @@ import uuid
 app = FastAPI()
 
 @app.post("/scan")
-async def submit_scan():
-    target = scan_request.target  # Extract the target from the request body
+async def submit_scan(request: Request):
+    data = await request.json()
+    target = data.get("target")
+    if not target:
+        raise HTTPException(status_code=400, detail="Target is required")
     scan_id = str(uuid.uuid4())
     # Submit Nmap task
     nmap_task = celery_app.send_task(
@@ -23,13 +26,12 @@ async def submit_scan():
     )
     
     # Store task IDs in DB
-    conn = get_db_connection()
-    conn.execute(
-        "INSERT INTO scans (id, target, tool, status) VALUES (?, ?, ?, ?)",
-        (scan_id, target, "nmap", "pending")
-    )
-    conn.commit()
-    conn.close()
+    with get_db_connection() as conn:
+        conn.execute(
+            "INSERT INTO scans (id, target, tool, status) VALUES (?, ?, ?, ?)",
+            (scan_id, target, "nmap", "pending")
+        )
+        conn.commit()
     
     return {"scan_id": scan_id}
 
