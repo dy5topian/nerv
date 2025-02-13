@@ -6,6 +6,7 @@ API_URL = "http://localhost:8000"
 def submit_scan(target):
     try:
         response = requests.post(f"{API_URL}/scan", json={"target": target})
+        print('post request response: ',response.text)
         response.raise_for_status()  # Raise an error for bad responses
         return response.json()
     except requests.exceptions.RequestException as e:
