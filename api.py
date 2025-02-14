@@ -2,6 +2,8 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import JSONResponse
 from core.celery_app import app as celery_app
 from core.database import get_db_connection
+from celery.result import AsyncResult
+import time
 import uuid
 import sqlite3
 
@@ -34,8 +36,26 @@ async def submit_scan(request: Request):
         )
         conn.commit()
         conn.close()
+        # Wait for the task to complete
+        task_result = AsyncResult(nmap_task.id, app=celery_app)
+        while not task_result.ready():
+            time.sleep(1)  # Sleep for a second before checking again
         
-        return {"scan_id": scan_id}
+        # Get the result of the task
+        result = task_result.get()
+        
+        # Update the database with the result
+        conn = get_db_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE scans SET status = ?, results = ? WHERE task_id = ?",
+            ("completed", str(result), nmap_task.id)
+        )
+        conn.commit()
+        conn.close()
+        
+        return {"scan_id": scan_id, "status": "completed", "results": result}
+        
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to submit scan: {str(e)}")
 

@@ -16,10 +16,8 @@ make your requests with the cli : python cli.py example.com or with the curl com
 
 - for each agent , you need to declare it as '@shared_task' in it's main function 
 then celery will have access to it.
-- the command line errors 500 , but celery still executes the nmap agent in the background ,
- need some sort of a session request  unitl it gets back the data!
-
-
+- remember to get_db_connection before each database query
+- 
 
 
 
@@ -29,4 +27,8 @@ then celery will have access to it.
 - `127.0.0.1:52944 - "POST /scan HTTP/1.1" 422 Unprocessable Entity` upon sending a request to scan ! [Done]
 - i still don't understand the need for for redis and ! , for celery ? well task distrebutions maybe 
 - why can't we just do everyhting by subprocess spawning and not using celery?
+
+- so nmap agent look like working , one issue is that i need to store the result of celery in the result field in the database!
+
+
 
