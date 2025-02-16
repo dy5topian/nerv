@@ -32,3 +32,6 @@ then celery will have access to it.
 
 
 
+===> i was having this crazy issue that one scan submition, i get empty open ports 
+- a bit of context , my vm is slow , so i sshed to it with cursor on windows , but sence bridged is not working am using host-only rendering my kali unable to access the internet
+- this is why my nmap yeilds 0 ports cuz it can't resolve any ip/domain. fuck.
