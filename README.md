@@ -40,9 +40,4 @@
 
 
 
-## .gitignore:
-- for each agent , you need to declare it as '@shared_task' in it's main function then celery will have access to it.
-- remember to get_db_connection before each database query
-===> i was having this crazy issue that on scan submission, i get empty open ports 
-- a bit of context , my vm is slow , so i sshed to it with cursor on windows , but sence bridged is not working am using host-only rendering my kali unable to access the internet
-- this is why my nmap yeilds 0 ports cuz it can't resolve any ip/domain. fuck.
+
