@@ -12,7 +12,7 @@
   => start unicorn : `python3 -m uvicorn api:app --reload`.</br>
   => make your requests with the cli :` python cli.py example.com` </br>
 
-### archetecure?
+### Architecture?
 +  redis works like a broker that stores tmp data of the tasks distrebuted to agents
 + celery is needed to create and distribute task to agents , each agent is a subprocess of a tool , once the scan is done by the tool it reports back reports back to redis  ,and redis notifies celery which in it's tourn stores the data in a local databases fo future consultation
 + for that database storage , each scan has the following fields:
@@ -27,7 +27,7 @@
 
 - there should be a way to simplify this more maybe?
 - so nmap agent look like working , one issue is that i need to store the result of celery in the result field in the database! [done]
-- i need to figure out a way to parge each tool output and store it in a way the is easly accessable and easy to output for the user.
+- i need to figure out a way to parge each tool output and store it in a way the is easly accessible and easy to output for the user.
 - find what to put for the user while the scan is ongoing(output each finshed task or wait till everything is finished)[SEMI-DONE]
 - find a way to run everything with one command instead of 4 open teminal sessions
 - Ids in uuid4() maybe just make it simple and incremental? this also would avoid collusion?[DONE]
