@@ -8,7 +8,7 @@
 # how to run?
 !note: each of these commands should be run in a seprate terminal session.</br>
   => start redis server with : `redis-server`. </br>
-  => start the  celery worker : `python3 celery -A core.celery_app worker --loglevel=info`. </br>
+  => start the  celery worker : `python3 -m celery -A core.celery_app worker --loglevel=info`. </br>
   => start unicorn : `python3 -m uvicorn api:app --reload`.</br>
   => make your requests with the cli :` python cli.py example.com` </br>
 
