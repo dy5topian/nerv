@@ -16,12 +16,14 @@
 +  redis works like a broker that stores tmp data of the tasks distrebuted to agents
 + celery is needed to create and distribute task to agents , each agent is a subprocess of a tool , once the scan is done by the tool it reports back reports back to redis  ,and redis notifies celery which in it's tourn stores the data in a local databases fo future consultation
 + for that database storage , each scan has the following fields:
-    - scan_id INTEGER PRIMARY KEY AUTOINCREMENT, # each submitted scan has to have a uniq ID
+    - <s>scan_id INTEGER PRIMARY KEY AUTOINCREMENT, # each submitted scan has to have a uniq ID</s>
+    - task id is the new priamry key
      - task_id TEXT, task Id , # this is a subtask for each scan there's multiple tools running , thus each one has to have it's own id  
     - target TEXT, # the domain or the ip
     - tool TEXT, # the tool aka the agent
     - status TEXT, # the scan status (pending, complete, ongoing..)
     -  results TEXT (the output of the agent/tool)
++ added utils and orchestrator as well which are handy
 
 ### to fix?
 
@@ -31,11 +33,14 @@
 - find what to put for the user while the scan is ongoing(output each finshed task or wait till everything is finished)[SEMI-DONE]
 - find a way to run everything with one command instead of 4 open teminal sessions
 - Ids in uuid4() maybe just make it simple and incremental? this also would avoid collusion?[DONE]
+- i should probably not create a function for everything i want or maybe i should
+- i still don't like the architecture yet and the way i can upon database each and everytime (need some sort of design pattern in place)
+- 
 - 
 
 ## ideas?
-- agents to add: `whatweb`, `gobuster`,`subfinder`,`waymore`.
-- maybe a minimalistic web UI.?
+- agents to add: `whatweb` ✅, `gobuster`,`subfinder`,`waymore`.
+- maybe a minimalistic web UI.? 
 - 
 
 
