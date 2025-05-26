@@ -8,8 +8,8 @@ def init_db():
     conn = sqlite3.connect(DATABASE)
     c = conn.cursor()
     c.execute('''CREATE TABLE IF NOT EXISTS scans
-                 (scan_id INTEGER PRIMARY KEY AUTOINCREMENT,
-                 task_id TEXT,
+                 (scan_id INTEGER,
+                  task_id TEXT PRIMARY KEY,
                   target TEXT, 
                   tool TEXT, 
                   status TEXT, 

@@ -3,24 +3,27 @@ import subprocess
 import xml.etree.ElementTree as ET
 import requests
 from core.database import get_db_connection
+import logging
 
-@shared_task(bind=True)
-def run_nmap(self, target, options="-sV", callback_url=None):
+logger = logging.getLogger(__name__)
+
+@shared_task(bind=True, name='agents.nmap_agent.run_nmap')
+def run_nmap(self, target, callback_url=None):
     """
     Run an Nmap scan on the specified target with the given options.
 
-    :param self: Celery task instance (to access task ID).
+    :param self: Celery task instance
     :param target: The target to scan.
     :param options: The Nmap options to use.
     :param callback_url: A webhook URL to send results when the scan is completed.
     :return: A dictionary with the scan results.
     """
-    # Get the task ID assigned by Celery
-    task_id = self.request.id  
-
+    logger.info(f"Starting nmap scan for target: {target}")
+    
     # Sanitize input to prevent command injection
     target = target.replace(";", "").replace("&", "").replace("|", "").replace("$", "")
-    cmd = f"nmap {options} {target} -oX -"
+    cmd = f"nmap -F {target} -oX -"
+    logger.info(f"Running nmap command: {cmd}")
     
     try:
         # Execute the Nmap command
@@ -29,7 +32,7 @@ def run_nmap(self, target, options="-sV", callback_url=None):
             capture_output=True,
             text=True,
             timeout=300,
-            check=True  # Ensure subprocess raises an error on failure
+            check=True
         )
 
         # Parse the XML output
@@ -48,23 +51,17 @@ def run_nmap(self, target, options="-sV", callback_url=None):
             "ports": ports
         }
 
-        # Store results in the database using TASK ID
+        # Store results in the database
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute(
             "UPDATE scans SET status = ?, results = ? WHERE task_id = ?",
-            ("completed", str(scan_result), task_id)
+            ("complete", str(scan_result), self.request.id)
         )
         conn.commit()
         conn.close()
 
-        # Send result to webhook if provided
-        if callback_url:
-            try:
-                requests.post(callback_url, json={"task_id": task_id, "results": scan_result})
-            except requests.RequestException as e:
-                print(f"[!] Failed to send results to webhook: {e}")
-
+        logger.info(f"Nmap scan completed for target: {target}")
         return scan_result
 
     except subprocess.CalledProcessError as e:
@@ -74,15 +71,26 @@ def run_nmap(self, target, options="-sV", callback_url=None):
     except Exception as e:
         error_message = str(e)
 
-    # Update database with error using TASK ID
+    logger.error(f"Nmap scan failed for target {target}: {error_message}")
+
+    # Update database with error
     conn = get_db_connection()
     cursor = conn.cursor()
     cursor.execute(
         "UPDATE scans SET status = ?, results = ? WHERE task_id = ?",
-        ("failed", error_message, task_id)
+        ("failed", error_message, self.request.id)
     )
     conn.commit()
     conn.close()
 
     return {"status": "error", "message": error_message}
+
+def get_nmap_ports(scan_result):
+    """
+    Extracts and returns a list of open port numbers from the nmap scan result.
+    :param scan_result: The dictionary returned by run_nmap
+    :return: List of open port numbers (as integers)
+    """
+    ports = scan_result.get("ports", [])
+    return [int(port_info["port"]) for port_info in ports if "port" in port_info]
 
