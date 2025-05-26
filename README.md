@@ -16,7 +16,7 @@
 +  redis works like a broker that stores tmp data of the tasks distrebuted to agents
 + celery is needed to create and distribute task to agents , each agent is a subprocess of a tool , once the scan is done by the tool it reports back reports back to redis  ,and redis notifies celery which in it's tourn stores the data in a local databases fo future consultation
 + for that database storage , each scan has the following fields:
-    - <s>scan_id INTEGER PRIMARY KEY AUTOINCREMENT, # each submitted scan has to have a uniq ID</s>
+     - scan_id INTEGER
     - task id is the new priamry key
      - task_id TEXT, task Id , # this is a subtask for each scan there's multiple tools running , thus each one has to have it's own id  
     - target TEXT, # the domain or the ip
@@ -28,6 +28,7 @@
 ### to fix?
 
 - there should be a way to simplify this more maybe?
+-  <s>scan_id INTEGER PRIMARY KEY AUTOINCREMENT, # each submitted scan has to have a uniq ID</s> [DONE]
 - so nmap agent look like working , one issue is that i need to store the result of celery in the result field in the database! [done]
 - i need to figure out a way to parge each tool output and store it in a way the is easly accessible and easy to output for the user.
 - find what to put for the user while the scan is ongoing(output each finshed task or wait till everything is finished)[SEMI-DONE]
